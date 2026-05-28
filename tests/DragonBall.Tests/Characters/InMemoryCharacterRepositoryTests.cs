@@ -17,9 +17,16 @@ public sealed class InMemoryCharacterRepositoryTests
     }
 
     [Fact]
+    public void GetAll_seeded_characters_have_image_url()
+    {
+        var characters = _repository.GetAll();
+        characters.Should().AllSatisfy(c => c.ImageUrl.Should().NotBeNullOrEmpty());
+    }
+
+    [Fact]
     public void Add_returns_character_with_generated_id()
     {
-        var input = new Character { Name = "Bardock", Race = "Saiyan", PowerLevel = 10000, Affiliation = "None" };
+        var input = new Character { Name = "Bardock", Race = "Saiyan", PowerLevel = 10000, Affiliation = "None", ImageUrl = "https://example.com/bardock.webp" };
 
         var result = _repository.Add(input);
 
@@ -30,7 +37,7 @@ public sealed class InMemoryCharacterRepositoryTests
     [Fact]
     public void Add_persists_character_in_GetAll()
     {
-        var input = new Character { Name = "Bardock", Race = "Saiyan", PowerLevel = 10000, Affiliation = "None" };
+        var input = new Character { Name = "Bardock", Race = "Saiyan", PowerLevel = 10000, Affiliation = "None", ImageUrl = "https://example.com/bardock.webp" };
         var added = _repository.Add(input);
 
         _repository.GetAll().Should().Contain(c => c.Id == added.Id);
@@ -39,8 +46,8 @@ public sealed class InMemoryCharacterRepositoryTests
     [Fact]
     public void Add_increments_id_for_each_character()
     {
-        var first = _repository.Add(new Character { Name = "A", Race = "R", PowerLevel = 1, Affiliation = "X" });
-        var second = _repository.Add(new Character { Name = "B", Race = "R", PowerLevel = 1, Affiliation = "X" });
+        var first = _repository.Add(new Character { Name = "A", Race = "R", PowerLevel = 1, Affiliation = "X", ImageUrl = "https://example.com/a.webp" });
+        var second = _repository.Add(new Character { Name = "B", Race = "R", PowerLevel = 1, Affiliation = "X", ImageUrl = "https://example.com/b.webp" });
 
         second.Id.Should().BeGreaterThan(first.Id);
     }

@@ -28,4 +28,13 @@ public sealed class GetCharactersEndpointTests(WebApplicationFactory<Program> fa
         characters.Should().NotBeNullOrEmpty();
         characters.Should().Contain(c => c.Name == "Goku");
     }
+
+    [Fact]
+    public async Task GET_characters_returns_characters_with_image_url()
+    {
+        var response = await _client.GetAsync("/characters");
+        var characters = await response.Content.ReadFromJsonAsync<List<Character>>();
+
+        characters.Should().AllSatisfy(c => c.ImageUrl.Should().NotBeNullOrEmpty());
+    }
 }

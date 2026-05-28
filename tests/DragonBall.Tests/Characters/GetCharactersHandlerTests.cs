@@ -20,7 +20,7 @@ public sealed class GetCharactersHandlerTests
     {
         var expected = new List<Character>
         {
-            new() { Id = 1, Name = "Goku", Race = "Saiyan", PowerLevel = 9000, Affiliation = "Z Fighters" }
+            new() { Id = 1, Name = "Goku", Race = "Saiyan", PowerLevel = 9000, Affiliation = "Z Fighters", ImageUrl = "https://example.com/goku.webp" }
         };
         _repository.GetAll().Returns(expected);
 

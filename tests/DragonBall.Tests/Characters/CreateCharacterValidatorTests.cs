@@ -13,7 +13,7 @@ public sealed class CreateCharacterValidatorTests
     [Fact]
     public async Task Valid_command_passes()
     {
-        var result = await _validator.ValidateAsync(ValidCommand());
+        var result = await _validator.ValidateAsync(ValidCommand(), TestContext.Current.CancellationToken);
         result.IsValid.Should().BeTrue();
     }
 
@@ -22,7 +22,7 @@ public sealed class CreateCharacterValidatorTests
     [InlineData("   ")]
     public async Task Empty_name_fails(string name)
     {
-        var result = await _validator.ValidateAsync(ValidCommand() with { Name = name });
+        var result = await _validator.ValidateAsync(ValidCommand() with { Name = name }, TestContext.Current.CancellationToken);
         result.IsValid.Should().BeFalse();
         result.Errors.Should().Contain(e => e.PropertyName == "Name");
     }
@@ -30,7 +30,7 @@ public sealed class CreateCharacterValidatorTests
     [Fact]
     public async Task Name_exceeding_100_chars_fails()
     {
-        var result = await _validator.ValidateAsync(ValidCommand() with { Name = new string('A', 101) });
+        var result = await _validator.ValidateAsync(ValidCommand() with { Name = new string('A', 101) }, TestContext.Current.CancellationToken);
         result.IsValid.Should().BeFalse();
         result.Errors.Should().Contain(e => e.PropertyName == "Name");
     }
@@ -40,7 +40,7 @@ public sealed class CreateCharacterValidatorTests
     [InlineData("   ")]
     public async Task Empty_race_fails(string race)
     {
-        var result = await _validator.ValidateAsync(ValidCommand() with { Race = race });
+        var result = await _validator.ValidateAsync(ValidCommand() with { Race = race }, TestContext.Current.CancellationToken);
         result.IsValid.Should().BeFalse();
         result.Errors.Should().Contain(e => e.PropertyName == "Race");
     }
@@ -48,7 +48,7 @@ public sealed class CreateCharacterValidatorTests
     [Fact]
     public async Task Race_exceeding_50_chars_fails()
     {
-        var result = await _validator.ValidateAsync(ValidCommand() with { Race = new string('A', 51) });
+        var result = await _validator.ValidateAsync(ValidCommand() with { Race = new string('A', 51) }, TestContext.Current.CancellationToken);
         result.IsValid.Should().BeFalse();
         result.Errors.Should().Contain(e => e.PropertyName == "Race");
     }
@@ -58,7 +58,7 @@ public sealed class CreateCharacterValidatorTests
     [InlineData(-1)]
     public async Task PowerLevel_zero_or_negative_fails(int powerLevel)
     {
-        var result = await _validator.ValidateAsync(ValidCommand() with { PowerLevel = powerLevel });
+        var result = await _validator.ValidateAsync(ValidCommand() with { PowerLevel = powerLevel }, TestContext.Current.CancellationToken);
         result.IsValid.Should().BeFalse();
         result.Errors.Should().Contain(e => e.PropertyName == "PowerLevel");
     }
@@ -68,7 +68,7 @@ public sealed class CreateCharacterValidatorTests
     [InlineData("   ")]
     public async Task Empty_affiliation_fails(string affiliation)
     {
-        var result = await _validator.ValidateAsync(ValidCommand() with { Affiliation = affiliation });
+        var result = await _validator.ValidateAsync(ValidCommand() with { Affiliation = affiliation }, TestContext.Current.CancellationToken);
         result.IsValid.Should().BeFalse();
         result.Errors.Should().Contain(e => e.PropertyName == "Affiliation");
     }
@@ -76,7 +76,7 @@ public sealed class CreateCharacterValidatorTests
     [Fact]
     public async Task Affiliation_exceeding_100_chars_fails()
     {
-        var result = await _validator.ValidateAsync(ValidCommand() with { Affiliation = new string('A', 101) });
+        var result = await _validator.ValidateAsync(ValidCommand() with { Affiliation = new string('A', 101) }, TestContext.Current.CancellationToken);
         result.IsValid.Should().BeFalse();
         result.Errors.Should().Contain(e => e.PropertyName == "Affiliation");
     }

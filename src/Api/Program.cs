@@ -8,6 +8,14 @@ using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+        policy.WithOrigins("http://localhost:5173")
+              .AllowAnyHeader()
+              .AllowAnyMethod());
+});
+
 builder.Services.AddOpenApi();
 builder.Services.AddSingleton<ICharacterRepository, InMemoryCharacterRepository>();
 builder.Services.AddValidatorsFromAssembly(typeof(GetCharactersQuery).Assembly);
@@ -17,6 +25,7 @@ builder.Services.AddScoped<CreateCharacterHandler>();
 var app = builder.Build();
 
 app.UseHttpsRedirection();
+app.UseCors();
 
 if (app.Environment.IsDevelopment())
 {
