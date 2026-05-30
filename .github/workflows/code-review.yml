@@ -1,0 +1,76 @@
+name: Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  code-review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: anthropics/claude-code-action@beta
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          direct_prompt: |
+            You are a Senior Engineer conducting a Pull Request review for this Dragon Ball project.
+            Your goal is to ensure the code adheres strictly to the project's Vertical Slice Architecture (VSA), C# Best Practices, and React Best Practices.
+
+            Review the changes in this PR and provide structured feedback.
+
+            ---
+
+            ## Backend Checklist (.NET / C#)
+
+            ### 1. Vertical Slice Architecture (VSA)
+            - **Cohesion**: Check if the endpoint, request, response, and logic are in the same folder/slice.
+            - **Independence**: Ensure this slice doesn't reuse Request/Response models from other slices.
+            - **MinApiLib**: Verify the use of `PostEndpoint<T>`, `GetEndpoint<T>`, etc., and that `Configure()` sets the correct OpenAPI metadata and `WithValidation()` when needed.
+
+            ### 2. C# & .NET Standards
+            - **Async/Await**: Verify that `CancellationToken` is passed to all asynchronous calls (DB, API, etc.).
+            - **Logging**: Ensure `LoggerMessageAttribute` is used for structured logging instead of simple `_logger.LogInformation()`.
+            - **Validation**: Check if `WithValidation()` is called in the slice configuration and a `FluentValidation` class exists.
+            - **JSON serialization**: Confirm `ConfigureHttpJsonOptions` uses `JsonNamingPolicy.CamelCase` for camelCase responses.
+
+            ### 3. .NET Testing
+            - **Integration**: Verify there is a test exercising the slice via `WebApplicationFactory<Program>`.
+            - **Mocks**: Check that NSubstitute is used only for external infrastructure, not for domain logic.
+            - **CancellationToken**: Ensure `TestContext.Current.CancellationToken` is passed to all async calls (avoids xUnit1051 warning).
+
+            ---
+
+            ## Frontend Checklist (React / TypeScript)
+
+            ### 4. React Best Practices
+            - **Custom hooks for data**: All API fetch logic must live in `src/hooks/`. Components must not call `fetch` directly.
+            - **Fetch cleanup**: `useEffect` hooks with fetch must use `AbortController` and return a cleanup function.
+            - **Environment variables**: API URLs must use `import.meta.env.VITE_API_URL`, not hardcoded strings.
+            - **Memoization**: Derived data (filtered lists, unique sets) must use `useMemo`.
+            - **No duplicate constants**: Shared constants (e.g. `AFFILIATION_COLORS`) must be in `src/utils/`, not duplicated across components.
+            - **Accessibility**: Non-semantic interactive elements must have `role`, `tabIndex`, and keyboard handlers.
+
+            ### 5. Frontend Testing
+            - **Fixtures**: Shared test data must be in `src/test/fixtures.ts`.
+            - **Router wrapping**: Components using `useNavigate` or `<Link>` must be wrapped in `<MemoryRouter>` in tests.
+            - **Fetch mocking**: Hook tests must mock `global.fetch` with `vi.spyOn` and restore with `vi.restoreAllMocks()` in `afterEach`.
+            - **Coverage**: All components, hooks, and pages must have test coverage.
+
+            ---
+
+            ## Output Format
+
+            For each issue found, provide:
+            - **Location**: File and line number.
+            - **Severity**: 🔴 High / 🟡 Medium / 🟢 Low.
+            - **Problem**: Why it violates the standards.
+            - **Suggested Fix**: A code snippet showing the correction.
+
+            End the review with a summary table of all issues grouped by severity.
