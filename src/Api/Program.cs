@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Application.Characters;
 using Application.Characters.CreateCharacter;
 using Application.Characters.GetCharacters;
@@ -7,6 +8,9 @@ using MinApiLib.Endpoints;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.ConfigureHttpJsonOptions(options =>
+    options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase);
 
 builder.Services.AddCors(options =>
 {
