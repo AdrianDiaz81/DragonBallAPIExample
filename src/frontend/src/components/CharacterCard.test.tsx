@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { mockCharacter } from '../test/fixtures';
 import { CharacterCard } from './CharacterCard';
@@ -37,9 +36,9 @@ describe('CharacterCard', () => {
     expect(screen.getByRole('img', { name: 'Goku' })).toBeInTheDocument();
   });
 
-  it('navigates to character detail on click', async () => {
+  it('renders a link to character detail', () => {
     renderCard();
-    await userEvent.click(screen.getByText('Goku').closest('div')!);
+    expect(screen.getByRole('link')).toHaveAttribute('href', '/characters/1');
   });
 
   it('applies blue badge for Z Fighters affiliation', () => {

@@ -1,15 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { API_BASE } from '../config';
+import { AFFILIATION_COLORS, FALLBACK_IMAGE } from '../utils/affiliationColors';
 import type { Character } from '../types/character';
-
-const API_URL = 'http://localhost:5263/characters';
-
-const AFFILIATION_COLORS: Record<string, string> = {
-  'Z Fighters': 'bg-blue-600',
-  'Frieza Force': 'bg-purple-600',
-  'Red Ribbon Army': 'bg-red-600',
-  'None': 'bg-gray-600',
-};
 
 export function CharacterPage() {
   const { id } = useParams<{ id: string }>();
@@ -19,15 +12,20 @@ export function CharacterPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch(API_URL)
-      .then((res) => res.json() as Promise<Character[]>)
-      .then((all) => {
-        const found = all.find((c) => c.id === Number(id));
-        if (!found) throw new Error('Personaje no encontrado');
-        setCharacter(found);
+    const controller = new AbortController();
+
+    fetch(`${API_BASE}/characters/${id}`, { signal: controller.signal })
+      .then((res) => {
+        if (!res.ok) throw new Error(res.status === 404 ? 'Personaje no encontrado' : `Error ${res.status}`);
+        return res.json() as Promise<Character>;
       })
-      .catch((err: Error) => setError(err.message))
+      .then(setCharacter)
+      .catch((err: Error) => {
+        if (err.name !== 'AbortError') setError(err.message);
+      })
       .finally(() => setLoading(false));
+
+    return () => controller.abort();
   }, [id]);
 
   if (loading) {
@@ -74,8 +72,7 @@ export function CharacterPage() {
               alt={character.name}
               className="h-full object-contain object-bottom relative z-10"
               onError={(e) => {
-                (e.target as HTMLImageElement).src =
-                  'https://dragonball-api.com/characters/goku_normal.webp';
+                (e.target as HTMLImageElement).src = FALLBACK_IMAGE;
               }}
             />
           </div>

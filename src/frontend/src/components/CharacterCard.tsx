@@ -1,25 +1,18 @@
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { AFFILIATION_COLORS, FALLBACK_IMAGE } from '../utils/affiliationColors';
 import type { Character } from '../types/character';
 
 interface Props {
   character: Character;
 }
 
-const AFFILIATION_COLORS: Record<string, string> = {
-  'Z Fighters': 'bg-blue-600',
-  'Frieza Force': 'bg-purple-600',
-  'Red Ribbon Army': 'bg-red-600',
-  'None': 'bg-gray-600',
-};
-
 export function CharacterCard({ character }: Props) {
-  const navigate = useNavigate();
   const badgeColor = AFFILIATION_COLORS[character.affiliation] ?? 'bg-gray-600';
 
   return (
-    <div
-      onClick={() => navigate(`/characters/${character.id}`)}
-      className="group relative bg-[#111827] border border-[#1f2937] rounded-2xl overflow-hidden cursor-pointer
+    <Link
+      to={`/characters/${character.id}`}
+      className="group relative bg-[#111827] border border-[#1f2937] rounded-2xl overflow-hidden
                  transition-all duration-300 hover:border-orange-500 hover:shadow-[0_0_20px_rgba(249,115,22,0.3)]
                  hover:-translate-y-1"
     >
@@ -29,8 +22,7 @@ export function CharacterCard({ character }: Props) {
           alt={character.name}
           className="h-full w-full object-contain object-bottom transition-transform duration-300 group-hover:scale-105"
           onError={(e) => {
-            (e.target as HTMLImageElement).src =
-              'https://dragonball-api.com/characters/goku_normal.webp';
+            (e.target as HTMLImageElement).src = FALLBACK_IMAGE;
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#111827]/80 via-transparent to-transparent" />
@@ -51,6 +43,6 @@ export function CharacterCard({ character }: Props) {
           </span>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

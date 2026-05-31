@@ -20,6 +20,9 @@ describe('SearchBar', () => {
     await userEvent.type(screen.getByPlaceholderText('Buscar personaje...'), 'Goku');
 
     expect(onChange).toHaveBeenCalledTimes(4);
-    expect(onChange).toHaveBeenLastCalledWith('u');
+    expect(onChange).toHaveBeenNthCalledWith(1, 'G');
+    expect(onChange).toHaveBeenNthCalledWith(2, 'o');
+    expect(onChange).toHaveBeenNthCalledWith(3, 'k');
+    expect(onChange).toHaveBeenNthCalledWith(4, 'u');
   });
 });

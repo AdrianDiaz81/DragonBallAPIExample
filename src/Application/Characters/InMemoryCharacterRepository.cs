@@ -50,6 +50,8 @@ public sealed class InMemoryCharacterRepository : ICharacterRepository
 
     public IReadOnlyList<Character> GetAll() => _characters.AsReadOnly();
 
+    public Character? GetById(int id) => _characters.FirstOrDefault(c => c.Id == id);
+
     public Character Add(Character character)
     {
         var newId = _characters.Count > 0 ? _characters.Max(c => c.Id) + 1 : 1;
@@ -59,7 +61,8 @@ public sealed class InMemoryCharacterRepository : ICharacterRepository
             Name = character.Name,
             Race = character.Race,
             PowerLevel = character.PowerLevel,
-            Affiliation = character.Affiliation
+            Affiliation = character.Affiliation,
+            ImageUrl = character.ImageUrl
         };
         _characters.Add(newCharacter);
         return newCharacter;
