@@ -1,6 +1,7 @@
 using Application.Characters.UpdateCharacter;
 using Domain.Characters;
 using FluentValidation;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MinApiLib.Endpoints;
@@ -10,6 +11,13 @@ namespace Api.Characters;
 [Tags("Characters")]
 public record UpdateCharacter() : Put("/characters/{id}")
 {
+    protected override RouteHandlerBuilder Configure(RouteHandlerBuilder builder)
+        => builder
+            .Produces<Character>(200)
+            .ProducesProblem(404)
+            .ProducesProblem(422)
+            .ProducesProblem(400);
+
     public async Task<IResult> HandleAsync(
         int id,
         [FromBody] UpdateCharacterRequest body,
@@ -34,13 +42,7 @@ public record UpdateCharacter() : Put("/characters/{id}")
         }
         catch (ValidationException ex)
         {
-            var errors = ex.Errors
-                .GroupBy(e => e.PropertyName)
-                .ToDictionary(
-                    g => g.Key,
-                    g => g.Select(e => e.ErrorMessage).ToArray());
-
-            return Results.ValidationProblem(errors, statusCode: StatusCodes.Status422UnprocessableEntity);
+            return ex.ToValidationProblem();
         }
     }
 }

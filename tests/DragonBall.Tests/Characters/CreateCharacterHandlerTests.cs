@@ -2,6 +2,7 @@ using Application.Characters.CreateCharacter;
 using Domain.Characters;
 using FluentAssertions;
 using FluentValidation;
+using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 
 namespace DragonBall.Tests.Characters;
@@ -13,7 +14,10 @@ public sealed class CreateCharacterHandlerTests
 
     public CreateCharacterHandlerTests()
     {
-        _handler = new CreateCharacterHandler(_repository, new CreateCharacterValidator());
+        _handler = new CreateCharacterHandler(
+            _repository,
+            new CreateCharacterValidator(),
+            NullLogger<CreateCharacterHandler>.Instance);
     }
 
     [Fact]

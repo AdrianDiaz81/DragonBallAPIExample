@@ -4,6 +4,7 @@ namespace Application.Characters;
 
 public sealed class InMemoryCharacterRepository : ICharacterRepository
 {
+    private readonly Lock _lock = new();
     private readonly List<Character> _characters =
     [
         new() { Id = 1,  Name = "Goku",       LastName = "Son",           Race = "Saiyan",             PowerLevel = 9000,       Affiliation = "Z Fighters",      ImageUrl = "https://dragonball-api.com/characters/goku_normal.webp" },
@@ -54,47 +55,54 @@ public sealed class InMemoryCharacterRepository : ICharacterRepository
 
     public Character Add(Character character)
     {
-        var newId = _characters.Count > 0 ? _characters.Max(c => c.Id) + 1 : 1;
-        var newCharacter = new Character
+        lock (_lock)
         {
-            Id = newId,
-            Name = character.Name,
-            LastName = character.LastName,
-            Race = character.Race,
-            PowerLevel = character.PowerLevel,
-            Description = character.Description,
-            Affiliation = character.Affiliation,
-            ImageUrl = character.ImageUrl
-        };
-        _characters.Add(newCharacter);
-        return newCharacter;
+            var newId = _characters.Count > 0 ? _characters.Max(c => c.Id) + 1 : 1;
+            var newCharacter = new Character
+            {
+                Id = newId,
+                Name = character.Name,
+                LastName = character.LastName,
+                Race = character.Race,
+                PowerLevel = character.PowerLevel,
+                Description = character.Description,
+                Affiliation = character.Affiliation,
+                ImageUrl = character.ImageUrl
+            };
+            _characters.Add(newCharacter);
+            return newCharacter;
+        }
     }
 
-    public Character? Update(int id, string? name, string? lastName, string? race,
-        int? powerLevel, string? description, string? affiliation, string? imageUrl)
+    public Character? Update(int id, CharacterPatch patch)
     {
-        var index = _characters.FindIndex(c => c.Id == id);
-        if (index < 0) return null;
-
-        var existing = _characters[index];
-        var updated = new Character
+        lock (_lock)
         {
-            Id = existing.Id,
-            Name = name ?? existing.Name,
-            LastName = lastName ?? existing.LastName,
-            Race = race ?? existing.Race,
-            PowerLevel = powerLevel ?? existing.PowerLevel,
-            Description = description ?? existing.Description,
-            Affiliation = affiliation ?? existing.Affiliation,
-            ImageUrl = imageUrl ?? existing.ImageUrl
-        };
-        _characters[index] = updated;
-        return updated;
+            var index = _characters.FindIndex(c => c.Id == id);
+            if (index < 0) return null;
+
+            var existing = _characters[index];
+            var updated = new Character
+            {
+                Id = existing.Id,
+                Name = patch.Name ?? existing.Name,
+                LastName = patch.LastName ?? existing.LastName,
+                Race = patch.Race ?? existing.Race,
+                PowerLevel = patch.PowerLevel ?? existing.PowerLevel,
+                Description = patch.Description ?? existing.Description,
+                Affiliation = patch.Affiliation ?? existing.Affiliation,
+                ImageUrl = patch.ImageUrl ?? existing.ImageUrl
+            };
+            _characters[index] = updated;
+            return updated;
+        }
     }
 
     public bool Delete(int id)
     {
-        var removed = _characters.RemoveAll(c => c.Id == id);
-        return removed > 0;
+        lock (_lock)
+        {
+            return _characters.RemoveAll(c => c.Id == id) > 0;
+        }
     }
 }

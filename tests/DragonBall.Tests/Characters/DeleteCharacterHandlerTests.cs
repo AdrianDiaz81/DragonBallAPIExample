@@ -1,6 +1,7 @@
 using Application.Characters.DeleteCharacter;
 using Domain.Characters;
 using FluentAssertions;
+using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 
 namespace DragonBall.Tests.Characters;
@@ -12,7 +13,7 @@ public sealed class DeleteCharacterHandlerTests
 
     public DeleteCharacterHandlerTests()
     {
-        _handler = new DeleteCharacterHandler(_repository);
+        _handler = new DeleteCharacterHandler(_repository, NullLogger<DeleteCharacterHandler>.Instance);
     }
 
     [Fact]

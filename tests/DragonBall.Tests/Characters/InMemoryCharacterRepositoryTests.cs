@@ -26,7 +26,7 @@ public sealed class InMemoryCharacterRepositoryTests
     [Fact]
     public void Add_returns_character_with_generated_id()
     {
-        var input = new Character { Name = "Bardock", Race = "Saiyan", PowerLevel = 10000, Affiliation = "None", ImageUrl = "https://example.com/bardock.webp" };
+        var input = new Character { Name = "Bardock", LastName = "Bardock", Race = "Saiyan", PowerLevel = 10000, Affiliation = "None", ImageUrl = "https://example.com/bardock.webp" };
 
         var result = _repository.Add(input);
 
@@ -37,7 +37,7 @@ public sealed class InMemoryCharacterRepositoryTests
     [Fact]
     public void Add_persists_character_in_GetAll()
     {
-        var input = new Character { Name = "Bardock", Race = "Saiyan", PowerLevel = 10000, Affiliation = "None", ImageUrl = "https://example.com/bardock.webp" };
+        var input = new Character { Name = "Bardock", LastName = "Bardock", Race = "Saiyan", PowerLevel = 10000, Affiliation = "None", ImageUrl = "https://example.com/bardock.webp" };
         var added = _repository.Add(input);
 
         _repository.GetAll().Should().Contain(c => c.Id == added.Id);
@@ -57,7 +57,7 @@ public sealed class InMemoryCharacterRepositoryTests
     {
         var original = _repository.GetById(1)!;
 
-        var updated = _repository.Update(1, null, null, null, 99, null, null, null);
+        var updated = _repository.Update(1, new CharacterPatch(PowerLevel: 99));
 
         updated.Should().NotBeNull();
         updated!.PowerLevel.Should().Be(99);
@@ -68,7 +68,7 @@ public sealed class InMemoryCharacterRepositoryTests
     [Fact]
     public void Update_non_existent_id_returns_null()
     {
-        var result = _repository.Update(9999, "X", null, null, null, null, null, null);
+        var result = _repository.Update(9999, new CharacterPatch(Name: "X"));
         result.Should().BeNull();
     }
 

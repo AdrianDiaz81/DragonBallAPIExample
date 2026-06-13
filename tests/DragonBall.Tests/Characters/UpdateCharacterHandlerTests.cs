@@ -2,6 +2,7 @@ using Application.Characters.UpdateCharacter;
 using Domain.Characters;
 using FluentAssertions;
 using FluentValidation;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace DragonBall.Tests.Characters;
 
@@ -12,7 +13,10 @@ public sealed class UpdateCharacterHandlerTests
 
     public UpdateCharacterHandlerTests()
     {
-        _handler = new UpdateCharacterHandler(_repository, new UpdateCharacterValidator());
+        _handler = new UpdateCharacterHandler(
+            _repository,
+            new UpdateCharacterValidator(),
+            NullLogger<UpdateCharacterHandler>.Instance);
     }
 
     [Fact]
@@ -82,8 +86,7 @@ public sealed class UpdateCharacterHandlerTests
         public Character? GetById(int id) => _data.FirstOrDefault(c => c.Id == id);
         public Character Add(Character character) => character;
 
-        public Character? Update(int id, string? name, string? lastName, string? race,
-            int? powerLevel, string? description, string? affiliation, string? imageUrl)
+        public Character? Update(int id, CharacterPatch patch)
         {
             var index = _data.FindIndex(c => c.Id == id);
             if (index < 0) return null;
@@ -91,13 +94,13 @@ public sealed class UpdateCharacterHandlerTests
             var updated = new Character
             {
                 Id = e.Id,
-                Name = name ?? e.Name,
-                LastName = lastName ?? e.LastName,
-                Race = race ?? e.Race,
-                PowerLevel = powerLevel ?? e.PowerLevel,
-                Description = description ?? e.Description,
-                Affiliation = affiliation ?? e.Affiliation,
-                ImageUrl = imageUrl ?? e.ImageUrl
+                Name = patch.Name ?? e.Name,
+                LastName = patch.LastName ?? e.LastName,
+                Race = patch.Race ?? e.Race,
+                PowerLevel = patch.PowerLevel ?? e.PowerLevel,
+                Description = patch.Description ?? e.Description,
+                Affiliation = patch.Affiliation ?? e.Affiliation,
+                ImageUrl = patch.ImageUrl ?? e.ImageUrl
             };
             _data[index] = updated;
             return updated;
