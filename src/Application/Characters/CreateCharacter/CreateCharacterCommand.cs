@@ -2,6 +2,9 @@ namespace Application.Characters.CreateCharacter;
 
 public sealed record CreateCharacterCommand(
     string Name,
-    string Race,
+    string LastName,
+    string? Race,
     int PowerLevel,
-    string Affiliation);
+    string? Description,
+    string? Affiliation,
+    string? ImageUrl);

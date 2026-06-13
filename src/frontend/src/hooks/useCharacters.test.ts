@@ -8,7 +8,7 @@ describe('useCharacters', () => {
   });
 
   it('returns loading=true initially', () => {
-    vi.spyOn(global, 'fetch').mockResolvedValue({
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue({
       ok: true,
       json: () => new Promise(() => {}),
     } as Response);
@@ -21,7 +21,7 @@ describe('useCharacters', () => {
   });
 
   it('returns characters on successful fetch', async () => {
-    vi.spyOn(global, 'fetch').mockResolvedValue({
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue({
       ok: true,
       json: () => Promise.resolve(mockCharacters),
     } as Response);
@@ -35,7 +35,7 @@ describe('useCharacters', () => {
   });
 
   it('returns error when fetch fails with non-ok response', async () => {
-    vi.spyOn(global, 'fetch').mockResolvedValue({
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue({
       ok: false,
       status: 500,
       json: () => Promise.resolve({}),
@@ -50,7 +50,7 @@ describe('useCharacters', () => {
   });
 
   it('returns error when fetch throws a network error', async () => {
-    vi.spyOn(global, 'fetch').mockRejectedValue(new Error('Network error'));
+    vi.spyOn(globalThis, 'fetch').mockRejectedValue(new Error('Network error'));
 
     const { result } = renderHook(() => useCharacters());
 

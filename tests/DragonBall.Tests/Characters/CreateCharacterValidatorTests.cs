@@ -8,12 +8,27 @@ public sealed class CreateCharacterValidatorTests
     private readonly CreateCharacterValidator _validator = new();
 
     private static CreateCharacterCommand ValidCommand() =>
-        new("Goku", "Saiyan", 9000, "Z Fighters");
+        new("Goku", "Son", "Saiyan", 9000, null, null, null);
 
     [Fact]
     public async Task Valid_command_passes()
     {
         var result = await _validator.ValidateAsync(ValidCommand(), TestContext.Current.CancellationToken);
+        result.IsValid.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task Valid_command_with_zero_power_level_passes()
+    {
+        var result = await _validator.ValidateAsync(ValidCommand() with { PowerLevel = 0 }, TestContext.Current.CancellationToken);
+        result.IsValid.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task Valid_command_without_optional_fields_passes()
+    {
+        var command = new CreateCharacterCommand("Goku", "Son", null, 9000, null, null, null);
+        var result = await _validator.ValidateAsync(command, TestContext.Current.CancellationToken);
         result.IsValid.Should().BeTrue();
     }
 
@@ -38,46 +53,49 @@ public sealed class CreateCharacterValidatorTests
     [Theory]
     [InlineData("")]
     [InlineData("   ")]
-    public async Task Empty_race_fails(string race)
+    public async Task Empty_last_name_fails(string lastName)
     {
-        var result = await _validator.ValidateAsync(ValidCommand() with { Race = race }, TestContext.Current.CancellationToken);
+        var result = await _validator.ValidateAsync(ValidCommand() with { LastName = lastName }, TestContext.Current.CancellationToken);
         result.IsValid.Should().BeFalse();
-        result.Errors.Should().Contain(e => e.PropertyName == "Race");
+        result.Errors.Should().Contain(e => e.PropertyName == "LastName");
     }
 
     [Fact]
-    public async Task Race_exceeding_50_chars_fails()
+    public async Task LastName_exceeding_100_chars_fails()
     {
-        var result = await _validator.ValidateAsync(ValidCommand() with { Race = new string('A', 51) }, TestContext.Current.CancellationToken);
+        var result = await _validator.ValidateAsync(ValidCommand() with { LastName = new string('A', 101) }, TestContext.Current.CancellationToken);
         result.IsValid.Should().BeFalse();
-        result.Errors.Should().Contain(e => e.PropertyName == "Race");
+        result.Errors.Should().Contain(e => e.PropertyName == "LastName");
     }
 
-    [Theory]
-    [InlineData(0)]
-    [InlineData(-1)]
-    public async Task PowerLevel_zero_or_negative_fails(int powerLevel)
+    [Fact]
+    public async Task Negative_power_level_fails()
     {
-        var result = await _validator.ValidateAsync(ValidCommand() with { PowerLevel = powerLevel }, TestContext.Current.CancellationToken);
+        var result = await _validator.ValidateAsync(ValidCommand() with { PowerLevel = -1 }, TestContext.Current.CancellationToken);
         result.IsValid.Should().BeFalse();
         result.Errors.Should().Contain(e => e.PropertyName == "PowerLevel");
     }
 
-    [Theory]
-    [InlineData("")]
-    [InlineData("   ")]
-    public async Task Empty_affiliation_fails(string affiliation)
+    [Fact]
+    public async Task Race_exceeding_100_chars_fails()
     {
-        var result = await _validator.ValidateAsync(ValidCommand() with { Affiliation = affiliation }, TestContext.Current.CancellationToken);
+        var result = await _validator.ValidateAsync(ValidCommand() with { Race = new string('A', 101) }, TestContext.Current.CancellationToken);
         result.IsValid.Should().BeFalse();
-        result.Errors.Should().Contain(e => e.PropertyName == "Affiliation");
+        result.Errors.Should().Contain(e => e.PropertyName == "Race");
     }
 
     [Fact]
-    public async Task Affiliation_exceeding_100_chars_fails()
+    public async Task Null_race_passes()
     {
-        var result = await _validator.ValidateAsync(ValidCommand() with { Affiliation = new string('A', 101) }, TestContext.Current.CancellationToken);
+        var result = await _validator.ValidateAsync(ValidCommand() with { Race = null }, TestContext.Current.CancellationToken);
+        result.IsValid.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task Description_exceeding_500_chars_fails()
+    {
+        var result = await _validator.ValidateAsync(ValidCommand() with { Description = new string('A', 501) }, TestContext.Current.CancellationToken);
         result.IsValid.Should().BeFalse();
-        result.Errors.Should().Contain(e => e.PropertyName == "Affiliation");
+        result.Errors.Should().Contain(e => e.PropertyName == "Description");
     }
 }

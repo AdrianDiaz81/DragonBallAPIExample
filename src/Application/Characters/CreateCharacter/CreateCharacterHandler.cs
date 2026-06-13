@@ -14,9 +14,12 @@ public sealed class CreateCharacterHandler(
         var character = new Character
         {
             Name = command.Name,
+            LastName = command.LastName,
             Race = command.Race,
             PowerLevel = command.PowerLevel,
-            Affiliation = command.Affiliation
+            Description = command.Description,
+            Affiliation = command.Affiliation,
+            ImageUrl = command.ImageUrl
         };
 
         return repository.Add(character);

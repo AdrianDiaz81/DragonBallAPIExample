@@ -14,7 +14,7 @@ public sealed class GetCharactersEndpointTests(WebApplicationFactory<Program> fa
     [Fact]
     public async Task GET_characters_returns_200()
     {
-        var response = await _client.GetAsync("/characters");
+        var response = await _client.GetAsync("/characters", TestContext.Current.CancellationToken);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -22,19 +22,19 @@ public sealed class GetCharactersEndpointTests(WebApplicationFactory<Program> fa
     [Fact]
     public async Task GET_characters_returns_list_of_characters()
     {
-        var response = await _client.GetAsync("/characters");
-        var characters = await response.Content.ReadFromJsonAsync<List<Character>>();
+        var response = await _client.GetAsync("/characters", TestContext.Current.CancellationToken);
+        var characters = await response.Content.ReadFromJsonAsync<List<Character>>(TestContext.Current.CancellationToken);
 
         characters.Should().NotBeNullOrEmpty();
-        characters.Should().Contain(c => c.Name == "Goku");
+        characters.Should().Contain(c => c.Name == "Goku" && c.LastName == "Son");
     }
 
     [Fact]
-    public async Task GET_characters_returns_characters_with_image_url()
+    public async Task GET_characters_returns_characters_with_last_name()
     {
-        var response = await _client.GetAsync("/characters");
-        var characters = await response.Content.ReadFromJsonAsync<List<Character>>();
+        var response = await _client.GetAsync("/characters", TestContext.Current.CancellationToken);
+        var characters = await response.Content.ReadFromJsonAsync<List<Character>>(TestContext.Current.CancellationToken);
 
-        characters.Should().AllSatisfy(c => c.ImageUrl.Should().NotBeNullOrEmpty());
+        characters.Should().AllSatisfy(c => c.LastName.Should().NotBeNullOrEmpty());
     }
 }

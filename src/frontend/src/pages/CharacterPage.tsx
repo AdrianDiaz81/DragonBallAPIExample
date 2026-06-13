@@ -1,32 +1,11 @@
-import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { API_BASE } from '../config';
 import { AFFILIATION_COLORS, FALLBACK_IMAGE } from '../utils/affiliationColors';
-import type { Character } from '../types/character';
+import { useCharacter } from '../hooks/useCharacter';
 
 export function CharacterPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [character, setCharacter] = useState<Character | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    fetch(`${API_BASE}/characters/${id}`, { signal: controller.signal })
-      .then((res) => {
-        if (!res.ok) throw new Error(res.status === 404 ? 'Personaje no encontrado' : `Error ${res.status}`);
-        return res.json() as Promise<Character>;
-      })
-      .then(setCharacter)
-      .catch((err: Error) => {
-        if (err.name !== 'AbortError') setError(err.message);
-      })
-      .finally(() => setLoading(false));
-
-    return () => controller.abort();
-  }, [id]);
+  const { character, loading, error } = useCharacter(id);
 
   if (loading) {
     return (
@@ -48,7 +27,7 @@ export function CharacterPage() {
     );
   }
 
-  const badgeColor = AFFILIATION_COLORS[character.affiliation] ?? 'bg-gray-600';
+  const badgeColor = (character.affiliation && AFFILIATION_COLORS[character.affiliation]) ?? 'bg-gray-600';
 
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
@@ -79,7 +58,7 @@ export function CharacterPage() {
 
           <div className="p-8">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-              <h1 className="text-4xl font-black text-white">{character.name}</h1>
+              <h1 className="text-4xl font-black text-white">{character.name} {character.lastName}</h1>
               <span className={`${badgeColor} text-white text-sm px-4 py-1.5 rounded-full font-medium self-start`}>
                 {character.affiliation}
               </span>
@@ -90,6 +69,13 @@ export function CharacterPage() {
               <Stat label="Afiliación" value={character.affiliation} />
               <Stat label="Nivel de poder" value={`⚡ ${character.powerLevel.toLocaleString()}`} highlight />
             </div>
+
+            {character.description && (
+              <div className="mt-6">
+                <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Descripción</p>
+                <p className="text-gray-300 leading-relaxed">{character.description}</p>
+              </div>
+            )}
           </div>
         </div>
       </main>
@@ -97,11 +83,11 @@ export function CharacterPage() {
   );
 }
 
-function Stat({ label, value, highlight = false }: { label: string; value: string; highlight?: boolean }) {
+function Stat({ label, value, highlight = false }: { label: string; value: string | undefined; highlight?: boolean }) {
   return (
     <div className="bg-[#1f2937] rounded-2xl p-4">
       <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">{label}</p>
-      <p className={`font-bold text-lg ${highlight ? 'text-orange-400' : 'text-white'}`}>{value}</p>
+      <p className={`font-bold text-lg ${highlight ? 'text-orange-400' : 'text-white'}`}>{value ?? '—'}</p>
     </div>
   );
 }

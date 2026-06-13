@@ -18,9 +18,9 @@ describe('CharacterGrid', () => {
 
   it('renders all character names', () => {
     renderGrid();
-    expect(screen.getByText('Goku')).toBeInTheDocument();
-    expect(screen.getByText('Vegeta')).toBeInTheDocument();
-    expect(screen.getByText('Frieza')).toBeInTheDocument();
+    expect(screen.getByText('Goku Son')).toBeInTheDocument();
+    expect(screen.getByText('Vegeta Ouji')).toBeInTheDocument();
+    expect(screen.getByText('Frieza Icejin')).toBeInTheDocument();
   });
 
   it('shows empty state message when list is empty', () => {

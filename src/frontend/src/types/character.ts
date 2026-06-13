@@ -1,8 +1,10 @@
 export interface Character {
   id: number;
   name: string;
+  lastName: string;
   race: string;
   powerLevel: number;
-  affiliation: string;
-  imageUrl: string;
+  description?: string;
+  affiliation?: string;
+  imageUrl?: string;
 }

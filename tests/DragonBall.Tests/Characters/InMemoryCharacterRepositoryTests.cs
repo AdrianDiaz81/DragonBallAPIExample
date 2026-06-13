@@ -46,9 +46,55 @@ public sealed class InMemoryCharacterRepositoryTests
     [Fact]
     public void Add_increments_id_for_each_character()
     {
-        var first = _repository.Add(new Character { Name = "A", Race = "R", PowerLevel = 1, Affiliation = "X", ImageUrl = "https://example.com/a.webp" });
-        var second = _repository.Add(new Character { Name = "B", Race = "R", PowerLevel = 1, Affiliation = "X", ImageUrl = "https://example.com/b.webp" });
+        var first = _repository.Add(new Character { Name = "A", LastName = "A", Race = "R", PowerLevel = 1 });
+        var second = _repository.Add(new Character { Name = "B", LastName = "B", Race = "R", PowerLevel = 1 });
 
         second.Id.Should().BeGreaterThan(first.Id);
+    }
+
+    [Fact]
+    public void Update_only_power_level_leaves_other_fields_unchanged()
+    {
+        var original = _repository.GetById(1)!;
+
+        var updated = _repository.Update(1, null, null, null, 99, null, null, null);
+
+        updated.Should().NotBeNull();
+        updated!.PowerLevel.Should().Be(99);
+        updated.Name.Should().Be(original.Name);
+        updated.LastName.Should().Be(original.LastName);
+    }
+
+    [Fact]
+    public void Update_non_existent_id_returns_null()
+    {
+        var result = _repository.Update(9999, "X", null, null, null, null, null, null);
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    public void Delete_existing_character_returns_true_and_removes_it()
+    {
+        var deleted = _repository.Delete(1);
+
+        deleted.Should().BeTrue();
+        _repository.GetById(1).Should().BeNull();
+    }
+
+    [Fact]
+    public void Delete_non_existent_id_returns_false()
+    {
+        var deleted = _repository.Delete(9999);
+        deleted.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Delete_all_characters_results_in_empty_collection()
+    {
+        var all = _repository.GetAll().ToList();
+        foreach (var character in all)
+            _repository.Delete(character.Id);
+
+        _repository.GetAll().Should().BeEmpty();
     }
 }

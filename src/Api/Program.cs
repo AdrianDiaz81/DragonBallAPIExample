@@ -1,7 +1,9 @@
 using Application.Characters;
 using Application.Characters.CreateCharacter;
+using Application.Characters.DeleteCharacter;
 using Application.Characters.GetCharacterById;
 using Application.Characters.GetCharacters;
+using Application.Characters.UpdateCharacter;
 using Domain.Characters;
 using FluentValidation;
 using MinApiLib.Endpoints;
@@ -23,17 +25,16 @@ builder.Services.AddValidatorsFromAssembly(typeof(GetCharactersQuery).Assembly);
 builder.Services.AddScoped<GetCharactersHandler>();
 builder.Services.AddScoped<GetCharacterByIdHandler>();
 builder.Services.AddScoped<CreateCharacterHandler>();
+builder.Services.AddScoped<UpdateCharacterHandler>();
+builder.Services.AddScoped<DeleteCharacterHandler>();
 
 var app = builder.Build();
 
 app.UseHttpsRedirection();
 app.UseCors();
 
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-    app.MapScalarApiReference();
-}
+app.MapOpenApi();
+app.MapScalarApiReference(); // default route: /scalar/{documentName} → /scalar/v1
 
 app.MapEndpoints();
 

@@ -10,9 +10,12 @@ export function HomePage() {
   const [selectedRace, setSelectedRace] = useState('');
   const [selectedAffiliation, setSelectedAffiliation] = useState('');
 
-  const races = useMemo(() => [...new Set(characters.map((c) => c.race))].sort(), [characters]);
+  const races = useMemo(
+    () => [...new Set(characters.map((c) => c.race).filter((r): r is string => r !== undefined))].sort(),
+    [characters],
+  );
   const affiliations = useMemo(
-    () => [...new Set(characters.map((c) => c.affiliation))].sort(),
+    () => [...new Set(characters.map((c) => c.affiliation).filter((a): a is string => a !== undefined))].sort(),
     [characters],
   );
 

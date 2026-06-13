@@ -1,9 +1,12 @@
 using Application.Characters.GetCharacterById;
+using Domain.Characters;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MinApiLib.Endpoints;
 
 namespace Api.Characters;
 
+[Tags("Characters")]
 public record GetCharacterById() : Get("/characters/{id}")
 {
     public async Task<IResult> HandleAsync(

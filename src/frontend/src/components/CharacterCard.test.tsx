@@ -11,9 +11,9 @@ const renderCard = (overrides = {}) =>
   );
 
 describe('CharacterCard', () => {
-  it('renders the character name', () => {
+  it('renders the character name and last name', () => {
     renderCard();
-    expect(screen.getByText('Goku')).toBeInTheDocument();
+    expect(screen.getByText('Goku Son')).toBeInTheDocument();
   });
 
   it('renders the character race', () => {

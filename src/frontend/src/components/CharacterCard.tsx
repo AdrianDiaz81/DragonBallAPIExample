@@ -7,7 +7,7 @@ interface Props {
 }
 
 export function CharacterCard({ character }: Props) {
-  const badgeColor = AFFILIATION_COLORS[character.affiliation] ?? 'bg-gray-600';
+  const badgeColor = (character.affiliation && AFFILIATION_COLORS[character.affiliation]) ?? 'bg-gray-600';
 
   return (
     <Link
@@ -30,7 +30,7 @@ export function CharacterCard({ character }: Props) {
 
       <div className="p-4">
         <h2 className="text-lg font-bold text-white truncate group-hover:text-orange-400 transition-colors">
-          {character.name}
+          {character.name} {character.lastName}
         </h2>
         <p className="text-sm text-gray-400 mt-1">{character.race}</p>
 
